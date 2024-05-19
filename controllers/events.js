@@ -3,6 +3,12 @@ const { Event } = require("../models/events");
 const ctrlWrapper = require("../helpers/ctrlWrapper");
 const { nanoid } = require("nanoid");
 
+const getAllEvents = async (req, res) => {
+  const events = await Event.find();
+
+  res.status(200).json({ events });
+};
+
 const addEvent = async (req, res) => {
   const newEvent = await Event.create({ ...req.body });
 
@@ -15,6 +21,17 @@ const addEvent = async (req, res) => {
       organizer: newEvent.organizer,
     },
   });
+};
+
+const getAllUsers = async (req, res) => {
+  const { eventId } = req.params;
+  const event = await Event.findById(eventId);
+  if (!event) {
+    throw HttpError(404, "Event does not exist");
+  }
+  console.log(event)
+
+  res.status(200).json({ users: event.users });
 };
 
 const registerUser = async (req, res) => {
@@ -57,4 +74,6 @@ const registerUser = async (req, res) => {
 module.exports = {
   registerUser: ctrlWrapper(registerUser),
   addEvent: ctrlWrapper(addEvent),
+  getAllEvents: ctrlWrapper(getAllEvents),
+  getAllUsers: ctrlWrapper(getAllUsers),
 };
